@@ -31,7 +31,7 @@
 | JWT        | Secure authentication              |
 | bcrypt     | Password hashing                   |
 | ts-node-dev| Fast local development             |
-| Next.js    | Frontend (planned)                 |
+| Next.js    | Frontend                           |
 
 ---
 
