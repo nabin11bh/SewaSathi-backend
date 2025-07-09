@@ -26,7 +26,7 @@
 |------------|------------------------------------|
 | TypeScript | Type-safe backend code             |
 | Express.js | RESTful API server                 |
-| PostgreSQL | Relational database                |
+| MySQL      | Relational database                |
 | Sequelize  | ORM for managing DB models         |
 | JWT        | Secure authentication              |
 | bcrypt     | Password hashing                   |
