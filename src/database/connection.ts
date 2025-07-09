@@ -1,5 +1,6 @@
-import { Sequelize } from "sequelize";
+import { Sequelize } from "sequelize-typescript";
 import { envConfig } from "../config/config"
+import { User } from "./models/user.model";
 
 const sequelize = new Sequelize({
   database: envConfig.database,
@@ -7,7 +8,8 @@ const sequelize = new Sequelize({
   password : envConfig.password,
   host : envConfig.host,
   dialect : envConfig.dialect,
-  port : envConfig.port
+  port : envConfig.port,
+  models : [User]
  
 })
 
@@ -17,6 +19,11 @@ sequelize.authenticate()
 })
 .catch((error)=>{
     console.log(error)
+})
+
+sequelize.sync({force:false})
+.then(()=>{
+  console.log("migrated successfully")
 })
 
 export default sequelize
