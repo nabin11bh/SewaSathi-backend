@@ -2,8 +2,7 @@
 # 🛠️ SewaSathi – Hyperlocal Service Marketplace for Nepal
 
 **SewaSathi** is a hyperlocal service marketplace platform built for Nepal, where users can hire nearby service providers 
-— such as plumbers, electricians, tutors, and more 
-— with features like **location-based matching**, **real-time booking**, **Khalti/eSewa payment integration**, and **ratings & reviews**
+— such as plumbers, electricians, tutors, and more
 
 ---
 
