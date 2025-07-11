@@ -5,7 +5,7 @@ import { User } from "../../../database/models/user.model";
 import { envConfig } from "../../../config/config";
 import { IUser } from "../../../types";
 
-const JWT_SECRET = envConfig.secret;
+const JWT_SECRET = envConfig.secret ||"defaultsecret";
 
 // POST /api/auth/register
 export const register = async (req: Request<{}, {}, IUser>, res: Response) => {
