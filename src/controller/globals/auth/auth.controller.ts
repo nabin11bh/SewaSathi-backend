@@ -21,7 +21,7 @@ export const register = async (req: Request<{}, {}, IUser>, res: Response) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user without typing it as IUser — just pass the fields
+    
     const user = await User.create({
       name,
       email,
@@ -31,7 +31,7 @@ export const register = async (req: Request<{}, {}, IUser>, res: Response) => {
       role,
     });
 
-    // Convert Sequelize instance to plain object and remove password
+    
     const { password: _, ...userWithoutPassword } = user.toJSON();
 
     res.status(201).json({
