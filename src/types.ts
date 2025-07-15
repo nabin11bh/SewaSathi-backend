@@ -4,6 +4,7 @@ export interface IUser {
     password: string;
     phone: string;
     address: string;
+    provideID:number,
     role: "customer" | "provider" | "admin"; 
     createdAt?: Date;
     updatedAt?: Date;
