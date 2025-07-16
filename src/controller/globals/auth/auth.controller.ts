@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { User } from "../../../database/models/user.model";
 import { envConfig } from "../../../config/config";
-import { IUser } from "../../../types";
+import { IUser } from "../../../types/user.type";
 
 const JWT_SECRET = envConfig.secret ||"defaultsecret";
 

@@ -11,7 +11,7 @@ import {
   Default,
 } from "sequelize-typescript";
 import { UUIDV4 } from "sequelize";
-import { IUser } from "../../types"; 
+import { IUser } from "../../types/user.type"; 
 
 
 export type IUserCreationAttributes = Omit<IUser, "createdAt" | "updatedAt">;
