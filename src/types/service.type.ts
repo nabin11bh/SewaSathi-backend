@@ -1,7 +1,7 @@
 
 
 export interface ServiceCreationAttrs {
-    providerId: number;
+    providerId: string;
     name: string;
     description: string;
     price: number;
