@@ -47,3 +47,22 @@ export const getAllServices = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
+//get single services by id
+
+export const getServiceById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const service = await Service.findByPk(id);
+
+    if (!service) {
+      return res.status(404).json({ message: "Service not found" });
+    }
+
+    return res.status(200).json({ service });
+  } catch (error) {
+    console.error("Error fetching service:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
