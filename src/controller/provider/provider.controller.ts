@@ -66,3 +66,31 @@ export const getServiceById = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
+//update services
+
+export const updateService = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { name, description, price, category } = req.body;
+
+    const service = await Service.findByPk(id);
+
+    if (!service) {
+      return res.status(404).json({ message: "Service not found" });
+    }
+
+    // @ts-ignore
+    if (service.providerId !== req.user?.id) {
+      return res.status(403).json({ message: "Not authorized to update this service" });
+    }
+
+    await service.update({ name, description, price, category });
+
+    return res.status(200).json({ message: "Service updated", service });
+  } catch (error) {
+    console.error("Error updating service:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
