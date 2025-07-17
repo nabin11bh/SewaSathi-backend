@@ -1,6 +1,7 @@
 import { Sequelize } from "sequelize-typescript";
 import { envConfig } from "../config/config"
 import { User } from "./models/user.model";
+import { Service } from "./models/service.model";
 
 
 
@@ -12,7 +13,7 @@ const sequelize = new Sequelize({
   host : envConfig.host,
   dialect : envConfig.dialect,
   port : envConfig.dbport,
-  models : [User]
+  models : [User,Service]
  
 })
 

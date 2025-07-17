@@ -20,7 +20,7 @@ export const createService = async (req: Request, res: Response) => {
     }
 
     const newService = await Service.create({
-      providerId,  // correctly using converted providerId
+      providerId,  
       name,
       description,
       price,
