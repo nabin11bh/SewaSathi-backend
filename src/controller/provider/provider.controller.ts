@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import { Service } from "../../database/models/service.model";
 
+
+//create services
+
 export const createService = async (req: Request, res: Response) => {
   try {
     const providerIdStr = req.user?.id;
@@ -30,6 +33,17 @@ export const createService = async (req: Request, res: Response) => {
     return res.status(201).json({ message: "Service created", service: newService });
   } catch (error) {
     console.error("Error creating service:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// get all services
+export const getAllServices = async (req: Request, res: Response) => {
+  try {
+    const services = await Service.findAll();
+    return res.status(200).json({ services });
+  } catch (error) {
+    console.error("Error fetching services:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
