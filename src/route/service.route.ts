@@ -15,8 +15,6 @@ router.post(
 
 router.get("/", getAllServices); 
 router.get("/:id", getServiceById); 
-
-router.post("/", authenticate, authorize("provider"), createService); 
 router.put("/:id", authenticate, authorize("provider"), updateService); 
 router.delete("/:id", authenticate, authorize("provider", "admin"), deleteService); 
 
