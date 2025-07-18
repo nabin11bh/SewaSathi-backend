@@ -28,3 +28,36 @@ export const createBooking = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+//for customer to see their booking
+
+export const getCustomerBookings = async (req: Request, res: Response) => {
+  try {
+    const customerId = req.user?.id;
+    const bookings = await Booking.findAll({ where: { customerId } });
+    res.json(bookings);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+//for provider to see the booking
+
+
+export const getProviderBookings = async (req: Request, res: Response) => {
+  try {
+    const providerId = req.user?.id;
+    const bookings = await Booking.findAll({
+      include: [
+        {
+          model: Service,
+          where: { providerId }
+        }
+      ]
+    });
+    res.json(bookings);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
