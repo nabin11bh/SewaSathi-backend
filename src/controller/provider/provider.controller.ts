@@ -1,20 +1,13 @@
 import { Request, Response } from "express";
 import { Service } from "../../database/models/service.model";
 
-
-//create services
-
+// Create service
 export const createService = async (req: Request, res: Response) => {
   try {
-    const providerIdStr = req.user?.id;
+    const providerId = req.user?.id; // UUID string directly
 
-    if (!providerIdStr) {
+    if (!providerId) {
       return res.status(401).json({ message: "Unauthorized: Provider ID missing" });
-    }
-
-    const providerId = parseInt(providerIdStr, 10);
-    if (isNaN(providerId)) {
-      return res.status(400).json({ message: "Invalid provider ID" });
     }
 
     const { name, description, price, category } = req.body;
@@ -37,7 +30,7 @@ export const createService = async (req: Request, res: Response) => {
   }
 };
 
-// get all services
+// Get all services
 export const getAllServices = async (req: Request, res: Response) => {
   try {
     const services = await Service.findAll();
@@ -48,9 +41,7 @@ export const getAllServices = async (req: Request, res: Response) => {
   }
 };
 
-
-//get single services by id
-
+// Get service by ID
 export const getServiceById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -67,9 +58,7 @@ export const getServiceById = async (req: Request, res: Response) => {
   }
 };
 
-
-//update services
-
+// Update service
 export const updateService = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -81,7 +70,6 @@ export const updateService = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Service not found" });
     }
 
-    // @ts-ignore
     if (service.providerId !== req.user?.id) {
       return res.status(403).json({ message: "Not authorized to update this service" });
     }
@@ -95,9 +83,7 @@ export const updateService = async (req: Request, res: Response) => {
   }
 };
 
-
-//delete services
-
+// Delete service
 export const deleteService = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -108,7 +94,7 @@ export const deleteService = async (req: Request, res: Response) => {
     }
 
     const isAdmin = req.user?.role === "admin";
-    const isOwner = service.providerId === Number(req.user?.id);
+    const isOwner = service.providerId === req.user?.id;
 
     if (!isAdmin && !isOwner) {
       return res.status(403).json({ message: "Not authorized to delete this service" });

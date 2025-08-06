@@ -1,5 +1,3 @@
-
-
 import {
   Table,
   Column,
@@ -13,7 +11,7 @@ import {
 import { User } from "./user.model";
 
 export interface ServiceCreationAttrs {
-  providerId: number;
+  providerId: string; // UUID string to match User.id
   name: string;
   description: string;
   price: number;
@@ -31,8 +29,8 @@ export class Service extends Model<Service, ServiceCreationAttrs> {
   id!: number;
 
   @ForeignKey(() => User)
-  @Column(DataType.INTEGER)
-  providerId!: number;
+  @Column(DataType.UUID)  // UUID type to match User.id
+  providerId!: string;
 
   @BelongsTo(() => User)
   provider!: User;

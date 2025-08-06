@@ -4,9 +4,12 @@ import { Service } from "../../database/models/service.model";
 
 export const createBooking = async (req: Request, res: Response) => {
   try {
-    const customerId = req.user?.id;
-    const { serviceId, scheduledDate } = req.body;
+    const customerId = req.user?.id;  // should be string (UUID)
+    if (!customerId) {
+      return res.status(401).json({ message: "Unauthorized: Customer ID missing" });
+    }
 
+    const { serviceId, scheduledDate } = req.body;
     if (!serviceId || !scheduledDate) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -29,35 +32,40 @@ export const createBooking = async (req: Request, res: Response) => {
   }
 };
 
-//for customer to see their booking
-
+// For customer to see their bookings
 export const getCustomerBookings = async (req: Request, res: Response) => {
   try {
     const customerId = req.user?.id;
+    if (!customerId) {
+      return res.status(401).json({ message: "Unauthorized: Customer ID missing" });
+    }
     const bookings = await Booking.findAll({ where: { customerId } });
     res.json(bookings);
   } catch (error) {
+    console.error("Error fetching customer bookings:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-
-//for provider to see the booking
-
-
+// For provider to see bookings on their services
 export const getProviderBookings = async (req: Request, res: Response) => {
   try {
     const providerId = req.user?.id;
+    if (!providerId) {
+      return res.status(401).json({ message: "Unauthorized: Provider ID missing" });
+    }
     const bookings = await Booking.findAll({
       include: [
         {
           model: Service,
-          where: { providerId }
-        }
-      ]
+          where: { providerId },
+          required: true,  // ensure INNER JOIN, only bookings for this provider's services
+        },
+      ],
     });
     res.json(bookings);
   } catch (error) {
+    console.error("Error fetching provider bookings:", error);
     res.status(500).json({ message: "Server error" });
   }
 };

@@ -11,17 +11,22 @@ import {
   Default,
 } from "sequelize-typescript";
 import { UUIDV4 } from "sequelize";
-import { IUser } from "../../types/user.type"; 
 
-
-export type IUserCreationAttributes = Omit<IUser, "createdAt" | "updatedAt">;
+export interface IUserCreationAttributes {
+  name: string;
+  email: string;
+  password: string;
+  phone: string;
+  address: string;
+  role?: "customer" | "provider" | "admin";
+}
 
 @Table({
   tableName: "users",
   modelName: "User",
   timestamps: true,
 })
-export class User extends Model<IUser, IUserCreationAttributes> {
+export class User extends Model<User, IUserCreationAttributes> {
   @PrimaryKey
   @Default(UUIDV4)
   @Column(DataType.UUID)
