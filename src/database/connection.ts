@@ -15,7 +15,7 @@ const sequelize = new Sequelize({
   host : envConfig.host,
   dialect : envConfig.dialect,
   port : envConfig.dbport,
-  models : [User,Service]
+  models : [User,Service,Booking]
  
 })
 
