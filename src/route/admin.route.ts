@@ -10,7 +10,7 @@ router.get(
   "/stats",
   authenticate,          
   authorize("admin"),    
-  getDashboardStats      
+  getDashboardStats             
 );
 
 
