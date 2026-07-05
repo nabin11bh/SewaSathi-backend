@@ -1,3 +1,4 @@
+// src/database/models/booking.model.ts
 import {
   Table,
   Column,
@@ -14,9 +15,12 @@ import { User } from "./user.model";
 import { Service } from "./service.model";
 
 export interface BookingCreationAttrs {
-  customerId: string;  // UUID matching User.id
-  serviceId: number;   // INTEGER matching Service.id
-  scheduledDate: Date;
+  customerId: string;
+  serviceId: number;
+  date: string;
+  time: string;
+  address: string;
+  notes?: string | null;
   status?: string;
 }
 
@@ -32,17 +36,31 @@ export class Booking extends Model<Booking, BookingCreationAttrs> {
 
   @ForeignKey(() => User)
   @AllowNull(false)
-  @Column(DataType.UUID)  // UUID matching User.id
+  @Column(DataType.UUID)
   customerId!: string;
 
   @ForeignKey(() => Service)
   @AllowNull(false)
-  @Column(DataType.INTEGER)  // INTEGER matching Service.id
+  @Column(DataType.INTEGER)
   serviceId!: number;
 
+  // Replaced the single `scheduledDate` with separate date/time strings —
+  // matches the frontend's BookingModal fields exactly, no parsing needed.
   @AllowNull(false)
-  @Column(DataType.DATE)
-  scheduledDate!: Date;
+  @Column(DataType.STRING)
+  date!: string;
+
+  @AllowNull(false)
+  @Column(DataType.STRING)
+  time!: string;
+
+  @AllowNull(false)
+  @Column(DataType.STRING)
+  address!: string;
+
+  @AllowNull(true)
+  @Column(DataType.TEXT)
+  notes!: string | null;
 
   @Default("pending")
   @Column(DataType.STRING)
