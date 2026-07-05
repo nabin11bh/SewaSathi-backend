@@ -1,3 +1,4 @@
+// src/database/models/user.model.ts
 import {
   Table,
   Column,
@@ -16,8 +17,8 @@ export interface IUserCreationAttributes {
   name: string;
   email: string;
   password: string;
-  phone: string;
-  address: string;
+  phone?: string;
+  address?: string;
   role?: "customer" | "provider" | "admin";
 }
 
@@ -45,19 +46,34 @@ export class User extends Model<User, IUserCreationAttributes> {
   @Column(DataType.STRING)
   password!: string;
 
-  @AllowNull(false)
+  // Made optional — the frontend's Register form doesn't collect these.
+  // Customers/providers can fill them in later from Edit Profile.
+  @AllowNull(true)
   @Unique
   @Column(DataType.STRING)
-  phone!: string;
+  phone!: string | null;
 
-  @AllowNull(false)
+  @AllowNull(true)
   @Column(DataType.STRING)
-  address!: string;
+  address!: string | null;
 
   @AllowNull(false)
   @Default("customer")
   @Column(DataType.ENUM("customer", "provider", "admin"))
   role!: "customer" | "provider" | "admin";
+
+  // Used by the provider profile page and admin panel — optional extra fields.
+  @AllowNull(true)
+  @Column(DataType.TEXT)
+  bio!: string | null;
+
+  @AllowNull(true)
+  @Column(DataType.STRING)
+  skills!: string | null;
+
+  @AllowNull(true)
+  @Column(DataType.INTEGER)
+  experienceYears!: number | null;
 
   @CreatedAt
   @Column({ field: "created_at" })

@@ -5,7 +5,9 @@
 
             const router = Router();
 
-            router.post("/book", authenticate, authorize("customer"), createBooking);
+            router.post("/bookings", authenticate, authorize("customer"), createBooking);
+
+            // router.post("/booking", authenticate, authorize("customer"), createBooking);
 
             router.get("/", authenticate, authorize("customer"), getCustomerBookings);
 
