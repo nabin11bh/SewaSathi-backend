@@ -1,14 +1,17 @@
 // src/controller/provider/provider.controller.ts
 import { Request, Response } from "express";
-import { Op } from "sequelize";
+import { Op, fn, col } from "sequelize";
 import { Service } from "../../database/models/service.model";
 import { User } from "../../database/models/user.model";
+import { Review } from "../../database/models/review.model";
 
 const providerInclude = {
   model: User,
   as: "provider",
   attributes: ["id", "name", "address"],
 };
+
+type RatingStats = { rating: number; reviewCount: number };
 
 // POST /api/services/add
 export const createService = async (req: Request, res: Response) => {
@@ -45,34 +48,34 @@ export const createService = async (req: Request, res: Response) => {
 // GET /api/services?search=&category=&priceRange=0-500&providerId=&page=1&limit=9
 export const getAllServices = async (req: Request, res: Response) => {
   try {
-    const { search, category, priceRange, providerId, page, limit } = req.query as { [key: string]: string };
+    const { search, category, priceRange, providerId, page, limit } = req.query as {
+      [key: string]: string;
+    };
+
     const where: any = {};
     if (category) where.category = category;
     if (providerId) where.providerId = providerId;
     if (search) where.title = { [Op.like]: `%${search}%` };
 
     if (priceRange) {
-  const [minStr, maxStr] = priceRange.split("-");
-  const min = minStr ? Number(minStr) : undefined;
-  const max = maxStr && maxStr !== "" ? Number(maxStr) : undefined;
+      const [minStr, maxStr] = priceRange.split("-");
+      const min = minStr ? Number(minStr) : undefined;
+      const max = maxStr && maxStr !== "" ? Number(maxStr) : undefined;
 
-  const priceWhere: any = {};
-  let hasPriceFilter = false;
+      const priceWhere: any = {};
+      let hasPriceFilter = false;
 
-  if (min !== undefined && !Number.isNaN(min)) {
-    priceWhere[Op.gte] = min;
-    hasPriceFilter = true;
-  }
-  if (max !== undefined && !Number.isNaN(max)) {
-    priceWhere[Op.lte] = max;
-    hasPriceFilter = true;
-  }
+      if (min !== undefined && !Number.isNaN(min)) {
+        priceWhere[Op.gte] = min;
+        hasPriceFilter = true;
+      }
+      if (max !== undefined && !Number.isNaN(max)) {
+        priceWhere[Op.lte] = max;
+        hasPriceFilter = true;
+      }
 
-  // Using a plain boolean flag instead of Object.keys().length here —
-  // Op.gte/Op.lte are Symbols, and Object.keys() silently ignores
-  // Symbol-keyed properties, which was the actual bug.
-  if (hasPriceFilter) where.price = priceWhere;
-}
+      if (hasPriceFilter) where.price = priceWhere;
+    }
 
     const pageNum = page ? Math.max(1, parseInt(page, 10)) : 1;
     const limitNum = limit ? Math.max(1, parseInt(limit, 10)) : undefined;
@@ -90,9 +93,40 @@ export const getAllServices = async (req: Request, res: Response) => {
 
     const { rows, count } = await Service.findAndCountAll(queryOptions);
 
-    // { items, total } — matches the shape the frontend's Services page
-    // and pagination component expect.
-    return res.status(200).json({ items: rows, total: count });
+    // Attach avg rating + review count to each service without an extra
+    // round trip per card — one grouped query for all services on this page.
+    const serviceIds = rows.map((s) => s.id);
+    const ratingMap = new Map<number, RatingStats>();
+
+    if (serviceIds.length) {
+      const ratingRows = (await Review.findAll({
+        where: { serviceId: serviceIds },
+        attributes: [
+          "serviceId",
+          [fn("AVG", col("rating")), "avgRating"],
+          [fn("COUNT", col("id")), "reviewCount"],
+        ],
+        group: ["serviceId"],
+        raw: true,
+      })) as any[];
+
+      for (const r of ratingRows) {
+        ratingMap.set(r.serviceId, {
+          rating: Number(r.avgRating),
+          reviewCount: Number(r.reviewCount),
+        });
+      }
+    }
+
+    const withRatings = rows.map((s) => {
+      const json = s.toJSON() as any;
+      const stats: RatingStats | undefined = ratingMap.get(s.id);
+      json.rating = stats ? stats.rating : null;
+      json.reviewCount = stats ? stats.reviewCount : 0;
+      return json;
+    });
+
+    return res.status(200).json({ items: withRatings, total: count });
   } catch (error) {
     console.error("Error fetching services:", error);
     return res.status(500).json({ message: "Internal server error" });
@@ -109,9 +143,20 @@ export const getServiceById = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Service not found" });
     }
 
-    // Bare object, not wrapped — the frontend's ServiceDetails page reads
-    // fields directly off the response (service.title, service.price, ...).
-    return res.status(200).json(service);
+    const reviewStats = (await Review.findAll({
+      where: { serviceId: service.id },
+      attributes: [
+        [fn("AVG", col("rating")), "avgRating"],
+        [fn("COUNT", col("id")), "reviewCount"],
+      ],
+      raw: true,
+    })) as any[];
+
+    const json = service.toJSON() as any;
+    json.rating = reviewStats[0]?.avgRating ? Number(reviewStats[0].avgRating) : null;
+    json.reviewCount = Number(reviewStats[0]?.reviewCount || 0);
+
+    return res.status(200).json(json);
   } catch (error) {
     console.error("Error fetching service:", error);
     return res.status(500).json({ message: "Internal server error" });

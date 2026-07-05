@@ -1,20 +1,56 @@
-import { Model, DataTypes } from "sequelize";
-import sequelize from "../../database/connection";
+// src/database/models/review.model.ts
+import {
+  Table,
+  Column,
+  Model,
+  PrimaryKey,
+  AutoIncrement,
+  DataType,
+  ForeignKey,
+  BelongsTo,
+  AllowNull,
+} from "sequelize-typescript";
 import { User } from "./user.model";
 import { Service } from "./service.model";
 
-export class Review extends Model {}
+export interface ReviewCreationAttrs {
+  customerId: string;
+  serviceId: number;
+  rating: number;
+  comment?: string | null;
+}
 
-Review.init(
-  {
-    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    customerId: { type: DataTypes.INTEGER, allowNull: false },
-    serviceId: { type: DataTypes.INTEGER, allowNull: false },
-    rating: { type: DataTypes.INTEGER, allowNull: false }, // 1 to 5
-    comment: { type: DataTypes.TEXT, allowNull: true },
-  },
-  { sequelize, modelName: "review" }
-);
+@Table({
+  tableName: "reviews",
+  timestamps: true,
+})
+export class Review extends Model<Review, ReviewCreationAttrs> {
+  @PrimaryKey
+  @AutoIncrement
+  @Column(DataType.INTEGER)
+  id!: number;
 
-Review.belongsTo(User, { foreignKey: "customerId" });
-Review.belongsTo(Service, { foreignKey: "serviceId" });
+  @ForeignKey(() => User)
+  @AllowNull(false)
+  @Column(DataType.UUID)
+  customerId!: string;
+
+  @ForeignKey(() => Service)
+  @AllowNull(false)
+  @Column(DataType.INTEGER)
+  serviceId!: number;
+
+  @AllowNull(false)
+  @Column(DataType.INTEGER)
+  rating!: number;
+
+  @AllowNull(true)
+  @Column(DataType.TEXT)
+  comment!: string | null;
+
+  @BelongsTo(() => User)
+  customer!: User;
+
+  @BelongsTo(() => Service)
+  service!: Service;
+}
