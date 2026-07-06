@@ -11,11 +11,15 @@
   "description": "",
   "dependencies": {
     "@types/cors": "^2.8.19",
+    "@types/multer": "^2.2.0",
     "bcrypt": "^6.0.0",
+    "cloudinary": "^1.41.3",
     "cors": "^2.8.5",
     "dotenv": "^17.1.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
+    "multer": "^2.2.0",
+    "multer-storage-cloudinary": "^4.0.0",
     "mysql2": "^3.14.1",
     "sequelize": "^6.37.8",
     "sequelize-typescript": "^2.1.6"

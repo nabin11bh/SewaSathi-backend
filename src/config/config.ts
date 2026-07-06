@@ -1,3 +1,4 @@
+// src/config/config.ts
 import { Dialect } from "sequelize";
 
 export const envConfig = {
@@ -9,5 +10,10 @@ export const envConfig = {
   host: process.env.DB_HOST || "localhost",
   dialect: (process.env.DB_DIALECT || "mysql") as Dialect,
   dbport: parseInt(process.env.DB_PORT || "3306", 10),
-  secret: process.env.JWT_SECRET || ""
+  secret: process.env.JWT_SECRET || "",
+
+  // Cloudinary — used by upload.middleware.ts for real image uploads
+  cloudinaryName: process.env.CLOUDINARY_CLOUD_NAME || "",
+  cloudinaryApiKey: process.env.CLOUDINARY_API_KEY || "",
+  cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET || "",
 };

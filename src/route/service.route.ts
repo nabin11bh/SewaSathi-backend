@@ -1,23 +1,37 @@
-        import { Router } from "express";
-        import { authenticate } from "../middleware/auth.middleware";
-        import { authorize } from "../middleware/role.middleware";
-        import { createService } from "../controller/provider/provider.controller";
-        import { getAllServices,getServiceById,updateService,deleteService } from "../controller/provider/provider.controller";
+// src/route/service.route.ts
+import { Router } from "express";
+import { authenticate } from "../middleware/auth.middleware";
+import { authorize } from "../middleware/role.middleware";
+import { uploadServiceImage } from "../middleware/upload.middleware";
+import {
+  createService,
+  getAllServices,
+  getServiceById,
+  updateService,
+  deleteService,
+} from "../controller/provider/provider.controller";
 
-        const router = Router();
+const router = Router();
 
-        router.post(
-          "/add",
-          authenticate,
-          authorize("provider"),
-          createService
-        );
+router.get("/", getAllServices);
+router.get("/:id", getServiceById);
 
-        router.get("/", getAllServices); 
-        router.get("/:id", getServiceById); 
-        router.put("/:id", authenticate, authorize("provider"), updateService); 
-        router.delete("/:id", authenticate, authorize("provider", "admin"), deleteService); 
+router.post(
+  "/add",
+  authenticate,
+  authorize("provider"),
+  uploadServiceImage.single("image"),
+  createService
+);
 
+router.put(
+  "/:id",
+  authenticate,
+  authorize("provider"),
+  uploadServiceImage.single("image"),
+  updateService
+);
 
+router.delete("/:id", authenticate, deleteService);
 
-        export default router;
+export default router;

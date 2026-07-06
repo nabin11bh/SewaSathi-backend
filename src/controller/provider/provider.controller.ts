@@ -21,21 +21,25 @@ export const createService = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Unauthorized: Provider ID missing" });
     }
 
-    const { title, description, price, category, location, image } = req.body;
+    const { title, description, price, category, location } = req.body;
     if (!title || !description || !price || !category || !location) {
       return res
         .status(400)
         .json({ message: "Title, description, price, category, and location are required" });
     }
 
+    // multer-storage-cloudinary puts the uploaded file's full Cloudinary URL
+    // on req.file.path once the upload completes.
+    const image = req.file ? (req.file as any).path : null;
+
     const newService = await Service.create({
       providerId,
       title,
       description,
-      price,
+      price: Number(price),
       category,
       location,
-      image: image || null,
+      image,
     } as any);
 
     return res.status(201).json({ message: "Service created", service: newService });
@@ -93,8 +97,6 @@ export const getAllServices = async (req: Request, res: Response) => {
 
     const { rows, count } = await Service.findAndCountAll(queryOptions);
 
-    // Attach avg rating + review count to each service without an extra
-    // round trip per card — one grouped query for all services on this page.
     const serviceIds = rows.map((s) => s.id);
     const ratingMap = new Map<number, RatingStats>();
 
@@ -167,7 +169,7 @@ export const getServiceById = async (req: Request, res: Response) => {
 export const updateService = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { title, description, price, category, location, image } = req.body;
+    const { title, description, price, category, location } = req.body;
 
     const service = await Service.findByPk(id);
     if (!service) {
@@ -178,13 +180,17 @@ export const updateService = async (req: Request, res: Response) => {
       return res.status(403).json({ message: "Not authorized to update this service" });
     }
 
+    // Only replace the image if a new file was actually uploaded —
+    // otherwise keep whatever the service already had.
+    const image = req.file ? (req.file as any).path : service.image;
+
     await service.update({
       title: title ?? service.title,
       description: description ?? service.description,
-      price: price ?? service.price,
+      price: price ? Number(price) : service.price,
       category: category ?? service.category,
       location: location ?? service.location,
-      image: image ?? service.image,
+      image,
     });
 
     return res.status(200).json({ message: "Service updated", service });
