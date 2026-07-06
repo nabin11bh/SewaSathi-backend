@@ -5,6 +5,7 @@ import { User } from "./models/user.model";
 import { Service } from "./models/service.model";
 import { Booking } from "./models/booking.model";
 import { Review } from "./models/review.model";
+import { ContactMessage } from "./models/contact.model";
 
 const sequelize = new Sequelize({
   database: envConfig.database,
@@ -13,7 +14,7 @@ const sequelize = new Sequelize({
   host: envConfig.host,
   dialect: envConfig.dialect,
   port: envConfig.dbport,
-  models: [User, Service, Booking, Review],
+  models: [User, Service, Booking, Review, ContactMessage],
 });
 
 sequelize
